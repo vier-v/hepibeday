@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Ucapan Ulang Tahun</title>
+  <!-- Google Fonts Mea Culpa -->
+  <link href="https://fonts.googleapis.com/css2?family=Mea+Culpa&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --biru-muda: #aed6df;
+      --biru: #748dae;
+      --pink-muda: #f5babb;
+      --pink-putih: #fff5f2;
+    }
+    body {
+      background: linear-gradient(180deg, var(--biru-muda) 0%, var(--biru) 35%, var(--pink-muda) 70%, var(--pink-putih) 100%);
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-family: 'Mea Culpa', cursive;
+      margin: 0;
+      position: relative;
+      overflow: hidden;
+    }
+    .snow-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100vw;
+      height: 100vh;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .card {
+      background: var(--pink-putih);
+      padding: 40px 30px;
+      border-radius: 16px;
+      box-shadow: 0 4px 24px rgba(116,141,174,0.15);
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      font-family: 'Mea Culpa', cursive;
+      max-width: 440px;
+      width: 100%;
+      border: 2.5px solid var(--biru);
+      min-height: 520px;
+      z-index: 1;
+    }
+    .love-canvas {
+      position:absolute;
+      top:0;left:0;width:100%;height:100%;
+      pointer-events:none;
+      z-index:2;
+    }
+    h1 {
+      color: var(--biru);
+      margin-bottom: 10px;
+      font-family: 'Mea Culpa', cursive;
+      font-size: 2.2em;
+      letter-spacing: 1px;
+    }
+    .message {
+      font-size: 22px;
+      margin-bottom: 20px;
+      color: var(--biru);
+      font-family: 'Mea Culpa', cursive;
+      min-height: 120px;
+    }
+    .btn {
+      background: var(--biru);
+      color: white;
+      border: none;
+      padding: 12px 28px;
+      border-radius: 8px;
+      font-size: 22px;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s;
+      z-index: 2;
+      position: relative;
+      font-family: 'Mea Culpa', cursive;
+      margin-top: 10px;
+      box-shadow: 0 2px 8px rgba(116,141,174,0.10);
+    }
+    .btn:hover {
+      background: var(--pink-muda);
+      color: var(--biru);
+    }
+    label {
+      font-family: 'Mea Culpa', cursive;
+      color: var(--biru);
+      font-size: 1.2em;
+    }
+    input[type="range"] {
+      accent-color: var(--biru);
+      width: 70%;
+      margin-top: 10px;
+    }
+    #tahunValue {
+      font-weight: bold;
+      color: var(--biru);
+      font-size: 1.3em;
+      font-family: 'Mea Culpa', cursive;
+    }
+    #umurUcapan {
+      margin-top:10px;
+      color: var(--pink-muda);
+      font-size: 1.3em;
+      font-family:'Mea Culpa',cursive;
+      display:none;
+      text-shadow: 0 1px 0 #fff5f2;
+    }
+    /* Kotak surat */
+    .envelope-container {
+      margin: 30px auto 0 auto;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      z-index: 3;
+      position: relative; /* Tambahkan ini */
+    }
+    .envelope {
+      width: 90px;
+      height: 60px;
+      background: #fff5f2;
+      border: 2.5px solid var(--biru);
+      border-radius: 8px 8px 16px 16px;
+      position: relative;
+      cursor: pointer;
+      box-shadow: 0 2px 10px rgba(116,141,174,0.10);
+      transition: transform 0.15s;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+    .envelope:hover {
+      transform: scale(1.07) translateY(-2px);
+      box-shadow: 0 6px 18px rgba(116,141,174,0.18);
+    }
+    .envelope::before {
+      content: "";
+      position: absolute;
+      top: -32px;
+      left: 0;
+      width: 100%;
+      height: 32px;
+      background: linear-gradient(180deg, #fff5f2 70%, #f5babb 100%);
+      border-radius: 12px 12px 0 0;
+      border-bottom: 2.5px solid var(--biru);
+      z-index: 2;
+    }
+    .envelope-emoji {
+      font-size: 2.2em;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%,-50%);
+      z-index: 3;
+      pointer-events: none;
+      user-select: none;
+    }
+    .envelope-label {
+      margin-top: 10px;
+      color: var(--biru);
+      font-size: 1.1em;
+      font-family: 'Mea Culpa', cursive;
+      letter-spacing: 0.5px;
+    }
+    .surat-popup {
+      display: none;
+      position: fixed; /* Ubah dari absolute ke fixed */
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+      width: 370px; /* Lebarkan sedikit */
+      background: #fff5f2;
+      border: 2.5px solid var(--biru);
+      border-radius: 16px;
+      box-shadow: 0 8px 32px rgba(116,141,174,0.18);
+      padding: 44px 32px 38px 32px; /* Tambah padding */
+      z-index: 999;
+      animation: suratPop 0.7s cubic-bezier(.6,-0.28,.74,1.13);
+    }
+    .surat-isi {
+      font-size: 1.55em; /* Lebih besar lagi */
+      color: var(--biru);
+      font-family: 'Mea Culpa', cursive;
+      text-align: left;
+      white-space: pre-line;
+      min-height: 120px;
+      margin-top: 10px;
+      line-height: 1.6;
+    }
+    @keyframes suratPop {
+      0% { opacity: 0; transform: translate(-50%, -140%) scale(0.7);}
+      80% { opacity: 1; transform: translate(-50%, -115%) scale(1.04);}
+      100% { opacity: 1; transform: translate(-50%, -110%) scale(1);}
+    }
+    .surat-close {
+      position: absolute;
+      top: 10px;
+      right: 18px;
+      font-size: 1.3em;
+      color: var(--biru);
+      background: none;
+      border: none;
+      cursor: pointer;
+      font-family: 'Mea Culpa', cursive;
+      z-index: 11;
+    }
+    @media (max-width: 500px) {
+      .card {
+        padding: 20px 8px;
+        max-width: 98vw;
+      }
+      h1 { font-size: 1.3em; }
+      .btn { font-size: 1em; }
+      .message { font-size: 1em; }
+      .surat-popup { width: 98vw; padding: 18px 4vw 18px 4vw;}
+    }
+  </style>
+</head>
+<body>
+  <canvas class="snow-canvas"></canvas>
+  <div class="card" style="z-index:1; position:relative;">
+    <audio id="audioSurat" src="lagu.mp3"></audio>
+    <canvas class="love-canvas"></canvas>
+    <h1>Selamat Ulang Tahun!</h1>
+
+    <!-- Panel 1: Input tanggal lahir -->
+    <div id="panelInput" style="display:block;">
+      <div style="margin-bottom:18px;">
+        <label for="tahun">Pilih Tahun Lahir:</label><br>
+        <input id="tahun" type="range" min="1990" max="2010" value="2000" oninput="updateBar(this.value)">
+        <div style="margin-top:8px;">
+          <span id="tahunValue">2000</span>
+        </div>
+        <div style="margin-top:18px;">
+          <label for="bulan">Pilih Bulan Lahir:</label><br>
+          <div id="bulanGame" style="display:flex;justify-content:center;gap:6px;flex-wrap:wrap;margin-top:8px;">
+            <!-- Tombol bulan akan di-generate JS -->
+          </div>
+        </div>
+        <div style="margin-top:18px;">
+          <label for="tanggal">Pilih Tanggal Lahir:</label><br>
+          <div id="tanggalGame" style="display:flex;justify-content:center;gap:4px;flex-wrap:wrap;margin-top:8px;">
+            <!-- Tombol tanggal akan di-generate JS -->
+          </div>
+        </div>
+        <div id="pilihanLahir" style="margin-top:14px;color:var(--biru);font-size:1.1em;min-height:28px;"></div>
+        <div id="umurUcapan" style="margin-top:10px;color:var(--pink-muda);font-size:1.3em;font-family:'Mea Culpa',cursive;display:none;text-shadow: 0 1px 0 #fff5f2;">
+          Selamat ulang tahun ke-<span id="umurValue">25</span>!
+        </div>
+      </div>
+      <button class="btn" id="lanjutBtn" onclick="lanjut()">Lanjut</button>
+    </div>
+
+    <!-- Panel 2: Kotak Surat -->
+    <div id="panelSurat" style="display:none;">
+      <div class="envelope-container">
+        <div class="envelope" id="envelopeBtn" title="Klik untuk membuka surat">
+          <span class="envelope-emoji">📩</span>
+        </div>
+        <div class="envelope-label">Ada surat spesial buat kamu!</div>
+        <div class="surat-popup" id="suratPopup">
+          <button class="surat-close" onclick="tutupSurat()" title="Tutup surat">&times;</button>
+          <div class="surat-isi" id="suratIsi"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    // --- SALJU WINTER ---
+    const snowCanvas = document.querySelector('.snow-canvas');
+    const snowCtx = snowCanvas.getContext('2d');
+    let snowflakes = [];
+    function resizeSnowCanvas() {
+      snowCanvas.width = window.innerWidth;
+      snowCanvas.height = window.innerHeight;
+    }
+    window.addEventListener('resize', resizeSnowCanvas);
+    resizeSnowCanvas();
+
+    function createSnowflake() {
+      return {
+        x: Math.random() * snowCanvas.width,
+        y: Math.random() * -snowCanvas.height,
+        r: Math.random() * 2.2 + 1.2,
+        speed: Math.random() * 1.2 + 0.5,
+        drift: Math.random() * 0.8 - 0.4,
+        opacity: Math.random() * 0.5 + 0.5
+      };
+    }
+    for (let i = 0; i < 70; i++) snowflakes.push(createSnowflake());
+    function animateSnow() {
+      snowCtx.clearRect(0, 0, snowCanvas.width, snowCanvas.height);
+      snowflakes.forEach(flake => {
+        snowCtx.save();
+        snowCtx.globalAlpha = flake.opacity;
+        snowCtx.beginPath();
+        snowCtx.arc(flake.x, flake.y, flake.r, 0, 2 * Math.PI);
+        snowCtx.fillStyle = "#fff";
+        snowCtx.shadowColor = "#fff";
+        snowCtx.shadowBlur = 8;
+        snowCtx.fill();
+        snowCtx.restore();
+        flake.y += flake.speed;
+        flake.x += flake.drift;
+        if (flake.y > snowCanvas.height) {
+          flake.x = Math.random() * snowCanvas.width;
+          flake.y = -10;
+        }
+      });
+      requestAnimationFrame(animateSnow);
+    }
+    animateSnow();
+
+    // --- GAME PILIH BULAN & TANGGAL ---
+    const bulanList = [
+      "Jan", "Feb", "Mar", "Apr", "Mei", "Jun",
+      "Jul", "Agu", "Sep", "Okt", "Nov", "Des"
+    ];
+    let bulanDipilih = null;
+    let tanggalDipilih = null;
+
+    // Generate tombol bulan
+    const bulanGame = document.getElementById('bulanGame');
+    bulanList.forEach((b, i) => {
+      const btn = document.createElement('button');
+      btn.textContent = b;
+      btn.className = 'btn-bulan';
+      btn.style.cssText = `
+        background: var(--pink-muda);
+        color: var(--biru);
+        border: none;
+        border-radius: 7px;
+        padding: 6px 13px;
+        font-size: 1em;
+        font-family: 'Mea Culpa', cursive;
+        cursor: pointer;
+        margin-bottom: 2px;
+        transition: background 0.2s, color 0.2s, transform 0.1s;
+      `;
+      btn.onclick = function() {
+        bulanDipilih = i + 1;
+        btn.style.transform = "scale(1.2)";
+        setTimeout(() => btn.style.transform = "scale(1)", 120);
+        bulanGame.querySelectorAll('button').forEach(bu => {
+          bu.style.background = "var(--pink-muda)";
+          bu.style.color = "var(--biru)";
+        });
+        btn.style.background = "var(--biru)";
+        btn.style.color = "white";
+        updatePilihanLahir();
+        generateTanggalButtons();
+      };
+      bulanGame.appendChild(btn);
+    });
+
+    // Generate tombol tanggal (1-31, update sesuai bulan)
+    function generateTanggalButtons() {
+      const tanggalGame = document.getElementById('tanggalGame');
+      tanggalGame.innerHTML = "";
+      let maxTanggal = 31;
+      if (bulanDipilih === 2) maxTanggal = 29;
+      else if ([4,6,9,11].includes(bulanDipilih)) maxTanggal = 30;
+      for (let t = 1; t <= maxTanggal; t++) {
+        const btn = document.createElement('button');
+        btn.textContent = t;
+        btn.className = 'btn-tanggal';
+        btn.style.cssText = `
+          background: var(--biru-muda);
+          color: var(--biru);
+          border: none;
+          border-radius: 7px;
+          padding: 5px 10px;
+          font-size: 1em;
+          font-family: 'Mea Culpa', cursive;
+          cursor: pointer;
+          margin-bottom: 2px;
+          transition: background 0.2s, color 0.2s, transform 0.1s;
+        `;
+        btn.onclick = function() {
+          tanggalDipilih = t;
+          btn.style.transform = "scale(1.2)";
+          setTimeout(() => btn.style.transform = "scale(1)", 120);
+          tanggalGame.querySelectorAll('button').forEach(bu => {
+            bu.style.background = "var(--biru-muda)";
+            bu.style.color = "var(--biru)";
+          });
+          btn.style.background = "var(--biru)";
+          btn.style.color = "white";
+          updatePilihanLahir();
+        };
+        tanggalGame.appendChild(btn);
+      }
+    }
+
+    function updatePilihanLahir() {
+      const out = document.getElementById('pilihanLahir');
+      let txt = "";
+      if (bulanDipilih && tanggalDipilih) {
+        txt = `🎉 Tanggal lahir kamu: <b>${tanggalDipilih} ${bulanList[bulanDipilih-1]}</b>`;
+      } else if (bulanDipilih) {
+        txt = `Pilih tanggal lahirmu di bulan <b>${bulanList[bulanDipilih-1]}</b>!`;
+      } else {
+        txt = "Pilih bulan dan tanggal lahir kamu!";
+      }
+      out.innerHTML = txt;
+    }
+
+    // --- END GAME PILIH BULAN & TANGGAL ---
+
+    // Panel logic
+    function lanjut() {
+      if (!bulanDipilih || !tanggalDipilih) {
+        const out = document.getElementById('pilihanLahir');
+        out.innerHTML = "😅 Pilih bulan & tanggal dulu ya!";
+        out.style.color = "#e74c3c";
+        out.style.animation = "shake 0.3s";
+        setTimeout(() => {
+          out.style.animation = "";
+          out.style.color = "var(--biru)";
+          updatePilihanLahir();
+        }, 400);
+        return;
+      }
+      document.getElementById('umurUcapan').style.display = "block";
+      setTimeout(() => {
+        document.getElementById('panelInput').style.display = "none";
+        document.getElementById('panelSurat').style.display = "block";
+      }, 900); // kasih jeda biar transisi terasa
+    }
+
+    // Tambahkan animasi shake di style
+    const style = document.createElement('style');
+    style.innerHTML = `
+      @keyframes shake {
+        0% { transform: translateX(0);}
+        25% { transform: translateX(-8px);}
+        50% { transform: translateX(8px);}
+        75% { transform: translateX(-8px);}
+        100% { transform: translateX(0);}
+      }
+    `;
+    document.head.appendChild(style);
+
+    // Envelope (surat) logic
+    const envelopeBtn = document.getElementById('envelopeBtn');
+    const suratPopup = document.getElementById('suratPopup');
+    const suratIsi = document.getElementById('suratIsi');
+    let suratSudahDibuka = false;
+
+    const audioSurat = document.getElementById('audioSurat');
+    envelopeBtn.onclick = function() {
+      suratPopup.style.display = "block";
+      if (!suratSudahDibuka) {
+        showWish();
+        suratSudahDibuka = true;
+      }
+      audioSurat.currentTime = 0;
+      audioSurat.play();
+      // Mulai animasi love confetti
+      loveConfettiActive = true;
+      animateLoveConfetti();
+    };
+    function tutupSurat() {
+      suratPopup.style.display = "none";
+      suratIsi.innerHTML = "";
+      suratSudahDibuka = false;
+      audioSurat.pause();
+      audioSurat.currentTime = 0;
+      // Stop animasi love confetti
+      loveConfettiActive = false;
+    }
+
+    // Ucapan hangat, personal, dan tidak kaku
+    function showWish() {
+      const umur = document.getElementById('umurValue').textContent;
+      const wishList = [
+        [
+          "Hai kamu yang spesial! Hari ini, aku cuma mau bilang makasih sudah jadi sosok yang selalu bikin hari-hari jadi lebih ceria. Aku bersyukur banget bisa kenal dan punya kamu di hidupku.",
+          `Semoga di usia yang ke-${umur} ini, semua impianmu makin dekat, langkahmu selalu ringan, dan hatimu selalu hangat. Jangan lupa, kamu nggak pernah sendiri. Aku selalu dukung dan doain yang terbaik buat kamu. Love you, happy birthday! 💗✨`
+        ],
+        [
+          "Selamat ulang tahun, orang baik! Terima kasih sudah jadi teman, sahabat, dan inspirasi buat banyak orang (termasuk aku). Kamu itu luar biasa, jangan pernah ragu sama diri sendiri ya.",
+          `Semoga di umur baru ini, kamu makin bahagia, makin sehat, dan makin banyak cerita indah. Semoga semua harapanmu di tahun ke-${umur} ini bisa terwujud satu per satu. Peluk hangat dan bintang-bintang untukmu! 💗🌟`
+        ],
+        [
+          "Happy birthday, my favorite human! Semoga hari ini penuh kejutan manis, tawa lepas, dan cinta dari orang-orang tersayang.",
+          `Di usia ke-${umur} ini, semoga kamu selalu dikelilingi kebahagiaan, diberi kesehatan, dan tetap jadi kamu yang tulus dan hangat. Jangan lupa, aku selalu ada buat kamu. God bless you, sayang! 💗✨`
+        ],
+        [
+          "Met ulang tahun! Aku doain kamu selalu sehat, rezeki lancar, dan hidupmu penuh warna kayak pelangi. Terima kasih sudah jadi alasan aku tersenyum tiap hari.",
+          `Semoga di usia ke-${umur} ini, kamu makin berani bermimpi dan nggak takut gagal. Ingat, aku bangga banget sama kamu! Semangat terus, ya. 💗🌟`
+        ]
+      ];
+      const wish = wishList[Math.floor(Math.random() * wishList.length)];
+      typeWriter(suratIsi, wish[0], () => {
+        setTimeout(() => {
+          typeWriter(suratIsi, "\n\n" + wish[1], null, true);
+        }, 700);
+      });
+      startLoveConfetti();
+    }
+
+    // Animasi typewriter untuk dua paragraf
+    function typeWriter(element, text, callback, append = false) {
+      let i = 0;
+      if (!append) element.innerHTML = "";
+      function typing() {
+        if (i < text.length) {
+          let char = text.charAt(i);
+          if (char === "\n") {
+            element.innerHTML += "<br>";
+          } else {
+            element.innerHTML += char;
+          }
+          i++;
+          setTimeout(typing, 22); // kecepatan ketik
+        } else if (callback) {
+          callback();
+        }
+      }
+      typing();
+    }
+
+    // ANIMASI LOVE & SPRINKLE BINTANG
+    const loveCanvas = document.querySelector('.love-canvas');
+    const loveCtx = loveCanvas.getContext('2d');
+    let loves = [];
+    let sprinkles = [];
+    let loveConfettiActive = false;
+
+    function resizeLoveCanvas() {
+      loveCanvas.width = loveCanvas.offsetWidth;
+      loveCanvas.height = loveCanvas.offsetHeight;
+    }
+    window.addEventListener('resize', resizeLoveCanvas);
+    resizeLoveCanvas();
+
+    function createLoveConfetti() {
+      // Pink love
+      loves.push({
+        x: Math.random() * loveCanvas.width,
+        y: -30,
+        size: Math.random() * 18 + 22,
+        speed: Math.random() * 1.2 + 0.7,
+        drift: Math.random() * 1.2 - 0.6,
+        opacity: Math.random() * 0.4 + 0.6,
+        rotate: Math.random() * Math.PI * 2,
+        rotateSpeed: (Math.random() - 0.5) * 0.04,
+        emoji: "💗"
+      });
+      // Sprinkle star
+      sprinkles.push({
+        x: Math.random() * loveCanvas.width,
+        y: -20,
+        size: Math.random() * 13 + 13,
+        speed: Math.random() * 1.3 + 0.7,
+        drift: Math.random() * 1.2 - 0.6,
+        opacity: Math.random() * 0.4 + 0.6,
+        rotate: Math.random() * Math.PI * 2,
+        rotateSpeed: (Math.random() - 0.5) * 0.04,
+        emoji: Math.random() > 0.5 ? "✨" : "🌟"
+      });
+    }
+
+    function drawLoveObj(obj) {
+      loveCtx.save();
+      loveCtx.globalAlpha = obj.opacity;
+      loveCtx.translate(obj.x, obj.y);
+      loveCtx.rotate(obj.rotate);
+      loveCtx.font = `${obj.size}px serif`;
+      loveCtx.textAlign = "center";
+      loveCtx.textBaseline = "middle";
+      loveCtx.fillText(obj.emoji, 0, 0);
+      loveCtx.restore();
+    }
+
+    function animateLoveConfetti() {
+      loveCtx.clearRect(0, 0, loveCanvas.width, loveCanvas.height);
+      loves.forEach(love => {
+        love.y += love.speed;
+        love.x += love.drift;
+        love.rotate += love.rotateSpeed;
+        drawLoveObj(love);
+      });
+      sprinkles.forEach(spr => {
+        spr.y += spr.speed;
+        spr.x += spr.drift;
+        spr.rotate += spr.rotateSpeed;
+        drawLoveObj(spr);
+      });
+      loves = loves.filter(love => love.y < loveCanvas.height + 40);
+      sprinkles = sprinkles.filter(spr => spr.y < loveCanvas.height + 40);
+      // Tambahkan love & sprinkle baru jika aktif
+      if (loveConfettiActive) {
+        if (loves.length < 28) createLoveConfetti();
+        requestAnimationFrame(animateLoveConfetti);
+      }
+    }
+
+    function startLoveConfetti() {
+      loves = [];
+      sprinkles = [];
+      loveConfettiActive = true;
+      for (let i = 0; i < 18; i++) createLoveConfetti();
+      animateLoveConfetti();
+    }
+
+    // Umur
+    function updateBar(val) {
+      document.getElementById('tahunValue').textContent = val;
+      // Hitung umur berdasarkan tahun sekarang
+      const tahunSekarang = new Date().getFullYear();
+      const umur = tahunSekarang - parseInt(val, 10);
+      document.getElementById('umurValue').textContent = umur;
+    }
+    // Set bar awal
+    updateBar(document.getElementById('tahun').value);
+  </script>
+</body>
+</html>
